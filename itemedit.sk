@@ -1,0 +1,866 @@
+# =====================================
+# ITEMEDIT
+# MADE BY: hrmfullAdvocado
+# DEPENDENCIES: Skript, SkBee
+# =====================================
+
+# ---------- ITEMEDIT COMMAND ----------
+command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
+    aliases: /itemedit
+    permission: skript.itemedit
+    trigger:
+        set {_item} to player's tool
+
+# ---------- RENAMING ----------
+
+        if arg-1 is "rename":
+            if arg-2 isn't set:
+                set name of player's tool to ""
+                stop
+            if arg-2 is "-clear":
+                set name of player's tool to ""
+                stop
+            if player's tool is air:
+                send "&cYou must be holding an item to rename it." to player
+                stop
+            else:
+                set {_name} to "%arg-2% %arg-3% %arg-4% %arg-5% %arg-6%"
+                replace all "<none>" in {_name} with ""
+                set {_colored} to colored {_name}
+                set name of player's tool to {_colored}
+                send "&aItem renamed to &r%{_colored}%&a" to player
+                stop
+
+# ---------- LORE ----------
+
+        if arg-1 is "lore":
+            if arg-2 is "add":
+                if player's tool is air:
+                    send "&cYou must be holding an item to set its lore." to player
+                    stop
+                if arg-3 is not set:
+                    send "&cPlease specify a lore line to add." to player
+                    stop
+                add colored "&r%arg-3%" to lore of player's tool
+                send "&aLore line added to item." to player
+
+
+
+            if arg-2 is "set":
+                if tool of player is air:
+                    send "&cYou must be holding an item to set its lore." to player
+                    stop
+                if arg-3 is not set:
+                    send "&cPlease specify the line number to set." to player
+                    stop
+                if arg-4 is not set:
+                    send "&cPlease specify the lore text." to player
+                    stop
+                set {_lore::*} to lore of tool of player
+                set {_lore::%arg-3%} to colored "&r%arg-4%"
+                set lore of tool of player to {_lore::*}
+                send "&aSet lore line %arg-3% to &f%arg-4%&a."
+
+
+
+            if arg-2 is "remove":
+                if tool of player is air:
+                    send "&cYou must be holding an item to remove lore." to player
+                    stop
+                if arg-3 is not set:
+                    send "&cPlease specify the line number to remove." to player
+                    stop
+                set {_lore::*} to lore of tool of player
+                delete {_lore::%arg-3%}
+                set lore of tool of player to {_lore::*}
+                send "&aRemoved lore line %arg-3% from your item."
+
+
+
+            if arg-2 is "reset":
+                if player's tool is air:
+                    send "&cYou must be holding an item to reset its lore." to player
+                    stop
+                clear lore of tool of player
+                send "&aItem lore reset." to player
+
+
+# ---------- UNBREAKABLE ----------
+
+        if arg-1 is "unbreakable":
+            if arg-2 is not set:
+                set player's tool to unbreakable tool
+            else if arg-2 is "true":
+                set player's tool to unbreakable tool
+            else if arg-2 is "false":
+                set player's tool to breakable tool
+
+# ---------- AMOUNT ----------
+
+        if arg-1 is "amount":
+            if arg-2 is not set:
+                send "&cPlease specify an amount." to player
+                stop
+            if arg-2 is not a number:
+                send "&cInvalid amount. Please enter a number." to player
+                stop
+            if player's tool is not set:
+                send "&cYou must be holding an item to set its amount." to player
+                stop
+            if arg-2 <= 0:
+                send "&cInvalid amount. Please enter a number between 1 and 99." to player
+                stop
+            if arg-2 > 99:
+                send "&cInvalid amount. Maximum stack size is 99." to player
+                stop
+            set amount of player's tool to arg-2 parsed as number
+            send "&aItem amount set to &f%arg-2%&a." to player
+
+# ---------- MAXSTACKSIZE ----------
+
+        if arg-1 is "maxstacksize":
+            if arg-2 is not set:
+                send "&cPlease specify a maximum stack size." to player
+                stop
+            if {_arg-2} is not a number:
+                send "&cInvalid maximum stack size. Please enter a number." to player
+                stop
+            if {_arg-2} <= 0:
+                send "&cInvalid maximum stack size. Please enter a number between 1 and 99." to player
+                stop
+            if {_arg-2} > 99:
+                send "&cInvalid maximum stack size. Maximum stack size is 99." to player
+                stop
+            set max stack size of player's tool to arg-2 parsed as number
+            send "&aItem maximum stack size set to &f%{_arg-2}%&a." to player
+
+
+# ---------- ENCHANT ----------
+
+        if arg-1 is "enchant":
+            set {_arg-2} to arg-2
+            set {_arg-3} to arg-3 parsed as number
+            if {_arg-3} is "<none>":
+                send "&cYou must specify a valid enchantment level." to player
+                stop
+            else:
+                set {_enchant} to "%{_arg-2}% %{_arg-3}%" parsed as enchantment type
+                if {_enchant} is not set:
+                    send "&cThat is not a valid enchantment." to player
+                    stop
+                enchant player's tool with {_enchant}
+                send "&aApplied enchantment %{_arg-2}% level %{_arg-3}% to your item." to player
+
+
+# ---------- DURABILITY ----------
+
+        if arg-1 is "durability":
+            set {_arg-2} to arg-2 parsed as number
+            if arg-2 is not set:
+                send "&cPlease specify a durability value." to player
+                stop
+            if {_arg-2} is not a number:
+                send "&cInvalid durability value. Please enter a number." to player
+                stop
+            if player's tool is not set:
+                send "&cYou must be holding an item to set its durability." to player
+                stop
+            set durability of player's tool to {_arg-2}
+            send "&aItem durability set to &f%{_arg-2}%&a." to player
+
+# ---------- FIRERESISTENT ----------
+
+        if arg-1 is "fireresistent":
+            if arg-2 is "true":
+                make player's tool fire resistant
+            else if arg-2 is "false":
+                make player's tool not fire resistant
+            else:
+                send "&cInvalid value. Please specify true or false." to player 
+                
+# ---------- GLOW ----------
+
+        if arg-1 is "glow":
+            if arg-2 is "true":
+                force the player's tool to start glinting
+            else if arg-2 is "false":
+                force the player's tool to stop glinting
+
+# ---------- FIREWORKPOWER ----------
+
+        if arg-1 is "fireworkpower":
+            if arg-2 is not set:
+                send "&cPlease specify a firework power value." to player
+                stop
+            if arg-2 is a number:
+                send "&cInvalid firework power value. Please enter a number." to player
+                stop
+            if player's tool is not set:
+                send "&cYou must be holding an item to set its firework power." to player
+                stop
+            set {_nbt} to nbt compound of {_item}
+            set {_flight} to arg-2 parsed as integer
+            set byte tag "minecraft:fireworks;flight_duration" of {_nbt} to {_flight}
+            set {_item} to {_item} with nbt {_nbt}
+            set player's tool to {_item}
+            send "&aFirework power set to &f%{_flight}%&a." to player
+
+
+# ---------- POTIONEFFECT ----------
+        if arg-1 is "potioneffect":
+            # require holding a potion / splash / lingering / water bottle
+            if player's tool is not potion:
+                if player's tool is not splash potion:
+                    if player's tool is not lingering potion:
+                        if player's tool is not bottle of water:
+                            send "&cHold a potion (regular/splash/lingering) or a bottle of water." to player
+                            stop
+
+            # ----------------- ADD -----------------
+            if arg-2 is "add":
+                if arg-3 is not set:
+                    send "&cUsage: /potion potioneffect add <effect> <level> <amount> <s/m/h>" to player
+                    stop
+
+                # normalize effect input
+                set {_raw::%uuid of player%} to lower case arg-3
+                replace all "_" with " " in {_raw::%uuid of player%}
+
+                # aliases
+                if {_raw::%uuid of player%} is "harming":
+                    set {_raw::%uuid of player%} to "instant damage"
+                if {_raw::%uuid of player%} is "instant damage":
+                    set {_raw::%uuid of player%} to "instant damage"
+                if {_raw::%uuid of player%} is "instant health":
+                    set {_raw::%uuid of player%} to "instant health"
+                if {_raw::%uuid of player%} is "bad luck":
+                    set {_raw::%uuid of player%} to "unluck"
+                if {_raw::%uuid of player%} is "night vision":
+                    set {_raw::%uuid of player%} to "night vision"
+                if {_raw::%uuid of player%} is "fire resistance":
+                    set {_raw::%uuid of player%} to "fire resistance"
+                if {_raw::%uuid of player%} is "water breathing":
+                    set {_raw::%uuid of player%} to "water breathing"
+                if {_raw::%uuid of player%} is "hero of the village":
+                    set {_raw::%uuid of player%} to "hero of the village"
+
+                set {pe::%uuid of player%} to {_raw::%uuid of player%} parsed as potion effect type
+                if {pe::%uuid of player%} is not set:
+                    send "&cUnknown potion effect: %arg-3%." to player
+                    stop
+
+                # parse level (tier)
+                if arg-4 is set:
+                    set {pe::%uuid of player%::level} to arg-4 parsed as number
+                    if {pe::%uuid of player%::level} < 1:
+                        set {pe::%uuid of player%::level} to 1
+                else:
+                    set {pe::%uuid of player%::level} to 1
+
+                # parse duration: <amount> <unit>
+                if arg-5 is set:
+                    if arg-6 is set:
+                        set {pe::%uuid of player%::amount} to arg-5 parsed as number
+                        if {pe::%uuid of player%::amount} is not set:
+                            send "&cInvalid duration amount: %arg-5%." to player
+                            stop
+                        set {tmpunit::%uuid of player%} to lower case arg-6
+
+                        if {tmpunit::%uuid of player%} is "s":
+                            set {pe::%uuid of player%::duration} to {pe::%uuid of player%::amount} * 1 second
+                        if {tmpunit::%uuid of player%} is "sec":
+                            set {pe::%uuid of player%::duration} to {pe::%uuid of player%::amount} * 1 second
+                        if {tmpunit::%uuid of player%} is "second":
+                            set {pe::%uuid of player%::duration} to {pe::%uuid of player%::amount} * 1 second
+                        if {tmpunit::%uuid of player%} is "seconds":
+                            set {pe::%uuid of player%::duration} to {pe::%uuid of player%::amount} * 1 second
+
+                        if {tmpunit::%uuid of player%} is "m":
+                            set {pe::%uuid of player%::duration} to {pe::%uuid of player%::amount} * 1 minute
+                        if {tmpunit::%uuid of player%} is "min":
+                            set {pe::%uuid of player%::duration} to {pe::%uuid of player%::amount} * 1 minute
+                        if {tmpunit::%uuid of player%} is "minute":
+                            set {pe::%uuid of player%::duration} to {pe::%uuid of player%::amount} * 1 minute
+                        if {tmpunit::%uuid of player%} is "minutes":
+                            set {pe::%uuid of player%::duration} to {pe::%uuid of player%::amount} * 1 minute
+
+                        if {tmpunit::%uuid of player%} is "h":
+                            set {pe::%uuid of player%::duration} to {pe::%uuid of player%::amount} * 1 hour
+                        if {tmpunit::%uuid of player%} is "hour":
+                            set {pe::%uuid of player%::duration} to {pe::%uuid of player%::amount} * 1 hour
+                        if {tmpunit::%uuid of player%} is "hours":
+                            set {pe::%uuid of player%::duration} to {pe::%uuid of player%::amount} * 1 hour
+
+                        # final check
+                        if {pe::%uuid of player%::duration} is not set:
+                            send "&cUnknown time unit: %arg-6% (use s/m/h)." to player
+                            stop
+                    else:
+                        send "&cUsage: /potion potioneffect add <effect> <level> <amount> <s/m/h>" to player
+                        stop
+                else:
+                    set {pe::%uuid of player%::duration} to 30 seconds
+
+                # create the new potion effect object
+                set {peobj::%uuid of player%} to new potion effect of {pe::%uuid of player%} potion of tier {pe::%uuid of player%::level} for {pe::%uuid of player%::duration}
+
+                # check if potion already has this effect → remove by type
+                loop potion effects of player's tool:
+                    if type of loop-value is {pe::%uuid of player%}:
+                        remove loop-value from potion effects of player's tool
+
+                # now add the new effect
+                add {peobj::%uuid of player%} to potion effects of player's tool
+
+                send "&aSet %arg-3% to level %{pe::%uuid of player%::level}% for %{pe::%uuid of player%::duration}% on your held potion."
+                stop
+
+            # ----------------- REMOVE -----------------
+            if arg-2 is "remove":
+                if arg-3 is not set:
+                    send "&cUsage: /potion potioneffect remove <effect>" to player
+                    stop
+                set {raw::%uuid of player%} to arg-3
+                replace all "_" with " " in {raw::%uuid of player%}
+                set {type::%uuid of player%} to {raw::%uuid of player%} parsed as potion effect type
+                if {type::%uuid of player%} is not set:
+                    if {raw::%uuid of player%} is "harming":
+                        set {type::%uuid of player%} to "instant damage" parsed as potion effect type
+                if {type::%uuid of player%} is not set:
+                    send "&cUnknown effect: %{raw::%uuid of player%}%." to player
+                    stop
+
+                # loop remove to make sure we get the right type
+                loop potion effects of player's tool:
+                    if type of loop-value is {type::%uuid of player%}:
+                        remove loop-value from potion effects of player's tool
+
+                send "&eRemoved %arg-3% from your held potion."
+                stop
+
+            # ----------------- RESET -----------------
+            if arg-2 is "reset":
+                set player's tool to water bottle
+                send "&cReset your held potion to a water bottle."
+                stop
+
+# ---------- HIDE ----------
+
+        if arg-1 is "hide":
+            set {arg-3} to arg-3
+            if arg-3 isn't set:
+                set {arg-3} to "true"
+            if player's tool is set:
+                set {_item} to player's tool
+                if arg-2 is "enchants":
+                    if {arg-3} is "true":
+                        add hide enchantments to item flags of player's tool
+                    else if {arg-3} is "false":
+                        remove hide enchantments from item flags of player's tool
+                if arg-2 is "attributes":
+                    if {arg-3} is "true":
+                        add hide attributes to item flags of player's tool
+                    else if {arg-3} is "false":
+                        remove hide attributes from item flags of player's tool
+                if arg-2 is "Unbreakable":
+                    if {arg-3} is "true":
+                        add hide unbreakable to item flags of player's tool
+                    else if {arg-3} is "false":
+                        remove hide unbreakable from item flags of player's tool
+
+# ---------- HIDEALL ----------
+
+        if arg-1 is "hideall":
+            if arg-2 isn't set:
+                add hide unbreakable to item flags of player's tool
+                add hide attributes to item flags of player's tool
+                add hide enchantments to item flags of player's tool
+
+            if arg-2 is "true":
+                add hide unbreakable to item flags of player's tool
+                add hide attributes to item flags of player's tool
+                add hide enchantments to item flags of player's tool
+
+            if arg-2 is "false":
+                remove hide unbreakable from item flags of player's tool
+                remove hide attributes from item flags of player's tool
+                remove hide enchantments from item flags of player's tool
+
+
+# ---------- REPAIRCOST ----------
+
+        if arg-1 is "repaircost":
+            set {arg-2} to arg-2
+            if arg-2 is set:
+                delete repair cost component of {_item}
+                set repair cost component of player's tool to {arg-2}
+
+# ---------- LEATHERCOLOR ----------
+
+        if arg-1 is "leathercolor":
+            if player's tool is set:
+                set {_color} to arg-2 parsed as color
+                if {_color} is set:
+                    dye player's tool {_color}
+                    send "&aLeather color set to %{_color}%!" to player
+                else:
+                    send "&cThat is not a valid leather color." to player
+            else:
+                send "&cYou must hold leather armor to dye it." to player
+
+
+
+# ---------- SKULLOWNER ----------
+
+        if arg-1 is "skullowner":
+            if arg-2 is set:
+                if player's tool is a player head:
+                    set head owner of player's tool to arg-2 parsed as offlineplayer
+                    send "&aSkull owner set to %arg-2%!" to player
+                else:
+                    send "&cYou must be holding a player head to set the owner." to player
+            else:
+                send "&cYou must specify a skull owner name." to player
+
+# ---------- BOOKAUTHOR ----------
+
+        if arg-1 is "bookauthor":
+            if arg-2 isn't "-clear":
+                if player's tool is a written book:
+                    set the book author of player's tool to arg-2
+                    send "&aBook author set to &f%arg-2% &a!" to player
+            else:
+                set the book author of player's tool to " "
+                send "&aBook author cleared!" to player
+
+# ---------- ATTRIBUTE ----------
+        if arg-1 is "attribute":
+            if arg-2 is "add":
+                if arg-3 contains "_":
+                    set {_attr} to removeUnderscores(arg-3) parsed as an attribute type
+                else:
+                    set {_attr} to arg-3 parsed as an attribute type
+
+                if arg-5 isn't set:
+                    set {_slot} to "%arg-5%_slot_group" parsed as equipment slot group
+                else:
+                    set {_slot} to "all_slot_group" parsed as equipment slot group
+                
+                if arg-3 is "knockback_resistance": # fixes knockback resistance doing 10x for some reason prob a skript problem
+                    set {_amount} to arg-4 parsed as number / 10
+                else:
+                    set {_amount} to arg-4 parsed as number
+
+                set {_id} to "minecraft:%{_attr}%"
+
+                delete {_attr} attribute modifier of player's tool
+                apply attribute modifier to player's tool:
+                    attribute: {_attr}
+                    id: {_id}
+                    slot: {_slot}
+                    amount: {_amount}
+                    operation: add_number
+                if arg-5 is set:
+                    send "&aApplied %{_attr}% with %{_amount}% on %{_slot}% slot."
+                    stop
+                else:
+                    send "&aApplied %{_attr}% with %{_amount}% on all slots."
+                    stop
+
+            if arg-2 is "remove":
+                if arg-3 contains "_":
+                    set {_attr} to removeUnderscores(arg-3) parsed as an attribute type
+                else:
+                    set {_attr} to arg-3 parsed as an attribute type
+                delete {_attr} attribute modifier of player's tool
+                send "&aRemoved %{_attr}% from held item."
+                stop
+
+# ---------- COMPASS ----------
+
+        if arg-1 is "compass":
+            if player's tool is a compass:
+
+                if arg-2 is "-clear":
+                    delete {compass::%uuid of player%}
+                    send "&aCompass tracking cleared." to player
+                    stop
+
+                if arg-2 is "set":
+                    send "&aCompass location set at &f%world of player% &7(%x-coordinate of player%, %y-coordinate of player%, %z-coordinate of player%)" to player
+                    set the player's compass target to location of player
+                    force the player's tool to start glinting
+
+
+
+
+# =====================================
+# SERVERITEM
+# =====================================
+
+command /serveritem <text> [<text>] [<text>] [<text>]:
+    permission: skript.serveritem
+    trigger:
+
+        # ==============================
+        # SAVE
+        # ==============================
+        if arg-1 is "save":
+            if player's tool is air:
+                send "&cYou must be holding an item to save it." to player
+                stop
+            if arg-2 is not set:
+                send "&cPlease specify a name for the server item." to player
+                stop
+            if {serveritems::%arg-2%} is set:
+                send "&cA server item with that name already exists." to player
+                stop
+            set {_item} to player's tool
+            set {serveritems::%arg-2%} to {_item}
+            send "&aServer item &f%arg-2% &asaved." to player
+
+        # ==============================
+        # DELETE
+        # ==============================
+        if arg-1 is "del":
+            if arg-2 is not set:
+                send "&cPlease specify the server item name." to player
+                stop
+            if {serveritems::%arg-2%} is not set:
+                send "&cThat server item does not exist." to player
+                stop
+            delete {serveritems::%arg-2%}
+            delete {serveritems_price::%arg-2%}
+            send "&aDeleted server item &f%arg-2%&a." to player
+
+        # ==============================
+        # GIVE TO PLAYER
+        # ==============================
+        if arg-1 is "give":
+            if arg-2 is not set:
+                send "&cPlease specify the server item name." to player
+                stop
+            if {serveritems::%arg-2%} is not set:
+                send "&cThat server item does not exist." to player
+                stop
+
+            if arg-3 is set:
+                set {_target} to arg-3 parsed as player
+                if {_target} is not set:
+                    send "&cThat player is not online." to player
+                    stop
+            else:
+                set {_target} to player
+
+            if arg-4 is set:
+                set {_amount} to arg-4 parsed as number
+                if {_amount} is not a number:
+                    send "&cInvalid amount. Please enter a number." to player
+                    stop
+            else:
+                set {_amount} to 1
+
+            give {_amount} of {serveritems::%arg-2%} to {_target}
+            send "&aYou gave %{_amount}% of &f%arg-2% &ato %{_target}%." to player
+
+        # ==============================
+        # TAKE FROM PLAYER
+        # ==============================
+        if arg-1 is "take":
+            if arg-2 is not set:
+                send "&cPlease specify the server item name." to player
+                stop
+            if {serveritems::%arg-2%} is not set:
+                send "&cThat server item does not exist." to player
+                stop
+
+            if arg-3 is set:
+                set {_target} to arg-3 parsed as player
+                if {_target} is not set:
+                    send "&cThat player is not online." to player
+                    stop
+            else:
+                set {_target} to player
+
+            if arg-4 is set:
+                set {_amount} to arg-4 parsed as number
+                if {_amount} is not a number:
+                    send "&cInvalid amount. Please enter a number." to player
+                    stop
+            else:
+                set {_amount} to 1
+
+            if {_target} does not have {_amount} of {serveritems::%arg-2%}:
+                send "&c%{_target}% does not have enough of that item." to player
+                stop
+            remove {_amount} of {serveritems::%arg-2%} from {_target}
+            send "&aYou took %{_amount}% of &f%arg-2% &afrom %{_target}%." to player
+
+
+        # ==============================
+        # SETNICK
+        # ==============================
+        if arg-1 is "setnick":
+            if arg-2 is not set:
+                send "&cPlease specify the server item name." to player
+                stop
+            if {serveritems::%arg-2%} is not set:
+                send "&cThat server item does not exist." to player
+                stop
+            if arg-3 is not set:
+                send "&cPlease specify the nickname." to player
+                stop
+            set {_item} to {serveritems::%arg-2%}
+            set name of {_item} to colored arg-3
+            set {serveritems::%arg-2%} to {_item}
+            send "&aSet nickname of &f%arg-2% &ato &f%arg-3%"
+        # ==============================
+        # SELL
+        # ==============================
+        if arg-1 is "sell":
+            if arg-4 is set:
+                set {_p} to arg-4 parsed as a player
+            else:
+                set {_p} to player
+            if arg-2 is not set:
+                send "&cPlease specify the server item name." to {_p}
+                stop
+            if {serveritems::%arg-2%} is not set:
+                send "&cThat server item does not exist." to {_p}
+                stop
+            set {_price} to arg-3 parsed as a number
+            if {_p} does not have {serveritems::%arg-2%}:
+                send "&cYou don't have that item to sell." to {_p}
+                stop
+            remove 1 of {serveritems::%arg-2%} from {_p}
+            add {_price} to balance of {_p}
+
+        # ==============================
+        # BUY
+        # ==============================
+        if arg-1 is "buy":
+            if arg-4 is set:
+                set {_p} to arg-4 parsed as a player
+            else:
+                set {_p} to player
+            if arg-2 is not set:
+                send "&cPlease specify the server item name." to {_p}
+                stop
+            if {serveritems::%arg-2%} is not set:
+                send "&cThat server item does not exist." to {_p}
+                stop
+            if balance of {_p} < {_price}:
+                set {_price} to arg-3
+                send "&cYou don't have enough money. Price: &e$%{_price}%" to {_p}
+                stop
+            set {_price} to arg-3 parsed as a number
+            remove {_price} from balance of {_p}
+            give 1 of {serveritems::%arg-2%} to {_p}
+
+        # ==============================
+        # LIST (GUI)
+        # ==============================
+        if arg-1 is "list":
+            if size of {serveritems::*} is 0:
+                send "&cNo server items are saved." to player
+                stop
+            set {_gui} to chest inventory named "&aServer Items" with 6 rows
+            set {_slot} to 0
+            loop {serveritems::*}:
+                if {_slot} >= 54:
+                    stop
+                set {_display} to type of loop-value
+                set {_item} to 1 of {_display}
+                if name of loop-value is set:
+                    set name of {_item} to name of loop-value
+                if lore of loop-value is set:
+                    set lore of {_item} to lore of loop-value
+                if enchantments of loop-value is set:
+                    enchant {_item} with enchantments of loop-value
+                add "&8ID:%loop-index%" to lore of {_item}
+                set slot {_slot} of {_gui} to {_item}
+                add 1 to {_slot}
+
+            # === INFO ITEM AT BOTTOM CENTER ===
+            set {_info} to name tag named "&bClick on items:"
+            set {_lore::*} to "&7[Left Click] &aGain 1"
+            add "&7[Right Click] &cDelete item" to {_lore::*}
+            set lore of {_info} to {_lore::*}
+            set slot 49 of {_gui} to {_info}
+
+            open {_gui} to player
+            set {serveritems_gui_open::%uuid of player%} to true
+
+# =====================================
+# GUI HANDLER
+# =====================================
+
+on inventory close:
+    if {serveritems_gui_open::%uuid of player%} is true:
+        delete {serveritems_gui_open::%uuid of player%}
+
+on inventory click:
+    if {serveritems_gui_open::%uuid of player%} is not true:
+        stop
+    cancel event
+
+    if event-item is not set:
+        stop
+    if event-item is air:
+        stop
+
+    set {_lore::*} to lore of event-item
+    if {_lore::*} is not set:
+        stop
+
+    set {_id} to ""
+    loop {_lore::*}:
+        set {_line} to uncolored loop-value
+        if {_line} starts with "ID:":
+            set {_id} to {_line}
+            replace all "ID:" with "" in {_id}
+
+    if {_id} is "":
+        stop
+
+    if click type is left mouse button:
+        make player execute command "/serveritem give %{_id}% %player% 1"
+
+    if click type is right mouse button:
+        make player execute command "/serveritem del %{_id}%"
+        wait 2 ticks
+        make player execute command "/serveritem list"
+
+
+
+# =====================================
+# ITEMEDIT TAB COMPLETION
+# =====================================
+
+on tab complete of "/ie" and "/itemedit":
+    set tab completions for position 1 to "rename", "potioneffect", "leathercolor", "attribute", "compass",  "bookauthor", "unbreakable", "amount", "maxstacksize", "enchant", "durability", "fireresistent", "glow", "fireworkpower", "hideall", "hide", "repaircost", "skullowner", "spawnegg" and "lore"
+
+# ---------- POTIONEFFECT TAB COMPLETION ----------
+
+    if tab arg-1 is "potioneffect":
+        set tab completions for position 2 to "add", "remove" and "reset"
+
+        if tab arg-2 is "add":
+            set tab completions for position 3 to "speed", "slowness", "haste", "mining_fatigue", "strength", "instant_health", "instant_damage", "harming", "jump_boost", "nausea", "regeneration", "resistance", "fire_resistance", "water_breathing", "invisibility", "blindness", "night_vision", "hunger", "weakness", "poison", "wither", "health_boost", "absorption", "saturation", "glowing", "levitation", "luck", "bad_luck", "slow_falling", "conduit_power", "dolphins_grace", "bad_omen", "hero_of_the_village", "darkness", "infested", "oozing", "weaving", "wind_charged", "raid_omen" and "trial_omen"
+            set tab completions for position 4 to "1", "2", "3", "4" and "5"
+            set tab completions for position 5 to "5", "10", "15", "20", "30", "60", "120", "300", "600" and "1200"
+            set tab completions for position 6 to "s", "sec", "second", "seconds", "m", "min", "minute", "minutes", "h", "hour" and "hours"
+
+        if tab arg-2 is "remove":
+            set tab completions for position 3 to "speed", "slowness", "haste", "mining_fatigue", "strength", "instant_health", "instant_damage", "harming", "jump_boost", "nausea", "regeneration", "resistance", "fire_resistance", "water_breathing", "invisibility", "blindness", "night_vision", "hunger", "weakness", "poison", "wither", "health_boost", "absorption", "saturation", "glowing", "levitation", "luck", "bad_luck", "slow_falling", "conduit_power", "dolphins_grace", "bad_omen", "hero_of_the_village", "darkness", "infested", "oozing", "weaving", "wind_charged", "raid_omen" and "trial_omen"
+            set {_list::*} to ""
+            loop potion effects of player's tool:
+                add "%type of loop-value%" to {_list::*}
+            set tab completions for position 3 to {_list::*}
+
+# ---------- SPAWNEGG TAB COMPLETION ----------
+
+    if tab arg-1 is "spawnegg":
+        set tab completions for position 2 to "Allay", "Armadillo", "Axolotl", "Bat", "Bee", "Blaze", "Bogged", "Breeze", "Camel", "Cat", "Chicken", "Creeper", "Dolphin", "Donkey", "Drowned", "Enderman", "Endermite", "Evoker", "Fox", "Goat", "Guardian", "Horse", "Husk", "Illusioner", "Llama", "Mooshroom", "Mule", "Ocelot", "Panda", "Parrot", "Phantom", "Pig", "Piglin", "Pillager", "Pufferfish", "Rabbit", "Ravager", "Salmon", "Sheep", "Skeleton", "Slime", "Snow Golem", "Spider", "Stray", "Turtle", "Vex", "Vindicator", "Warden", "Witch", "Wither", "Wolf", and "Zombie"
+
+# ---------- SKULLOWNER TAB COMPLETION ----------
+
+    if tab arg-1 is "skullowner":
+        set tab completions for position 2 to all players
+
+# ---------- ATTRIBUTE TAB COMPLETION ----------
+    if tab arg-1 is "attribute":
+        set tab completions for position 2 to "add" and "remove"
+        set tab completions for position 3 to "attack_damage", "attack_speed", "armor", "armor_toughness", "max_health", "movement_speed", "knockback_resistance", "luck", "attack_knockback", "scale", "step_height" and "gravity"
+
+        if tab arg-2 is "add":
+            set tab completions for position 4 to "0.5", "1", "2", "3", "4" and "5"
+            set tab completions for position 5 to "mainhand", "offhand", "head", "chest", "legs" and "feet"
+
+
+# ---------- LEATHERCOLOR TAB COMPLETION ----------
+
+    if tab arg-1 is "leathercolor":
+        set tab completions for position 2 to "white", "black", "red", "blue", "green", "yellow", "aqua", "fuchsia", "gray", "lime", "navy", "purple", "silver", "teal" and "orange"
+
+# ---------- COMPASS TAB COMPLETION ----------
+
+    if tab arg-1 is "compass":
+        set tab completions for position 2 to "set" and "-clear"
+
+# ---------- HIDEALL TAB COMPLETION ----------
+
+    if tab arg-1 is "hideall":
+        set tab completions for position 2 to "true" and "false"
+
+# ---------- HIDE TAB COMPLETION ----------
+
+    if tab arg-1 is "hide":
+        set tab completions for position 2 to "attributes", "enchants" and "unbreakable"
+        set tab completions for position 3 to "true" and "false"
+
+# ---------- FIREWORKPOWER TAB COMPLETION ----------
+
+    if tab arg-1 is "fireworkpower":
+        set tab completions for position 2 to "1", "2", "3", "4" and "5"
+
+# ---------- RENAME, BOOKATHOR TAB COMPLETION ----------
+
+    if tab arg-1 is "rename" or "bookauthor":
+        set tab completions for position 2 to " ", "-clear" and name of player's tool
+
+# ---------- UNBREAKABLE AND FIRERESTIENT TAB COMPLETION ----------
+
+    if tab arg-1 is "unbreakable", "fireresistent" or "glow":
+        set tab completions for position 2 to "true" and "false"
+
+# ---------- LORE TAB COMPLETION ----------
+
+    if tab arg-1 is "lore":
+        set tab completions for position 2 to "add", "set", "remove" and "reset"
+        if tab arg-2 is "set":
+            if player's tool is not air:
+                set {_lore::*} to lore of player's tool
+                loop {_lore::*}:
+                    add loop-index to {_numbers::*}
+                set tab completions for position 3 to {_numbers::*}	
+        if tab arg-2 is "remove":
+            if player's tool is not air:
+                set {_lore::*} to lore of player's tool
+                loop {_lore::*}:
+                    add loop-index to {_numbers::*}
+                set tab completions for position 3 to {_numbers::*}
+
+# ---------- AMOUNT, MAXSTACKSIZE, DURABILITY, TAB COMPLETION ----------
+
+    if tab arg-1 is "amount", "repaircost", "durability" or "maxstacksize":
+        set tab completions for position 2 to "1", "10", "64" and "99"
+
+
+# ---------- ENCHANT TAB COMPLETION ----------
+
+    if tab arg-1 is "enchant":
+        set {_enchants::*} to "Fireprotection", "Sharpness", "Flame", "Aquaaffinity", "Punch", "Loyalty", "Depthstrider", "Vanishingcurse", "Unbreaking", "Knockback", "Luckofthesea", "Bindingcurse", "Fortune", "Protection", "Efficiency", "Mending", "Frostwalker", "Lure", "Looting", "Blastprotection", "Smite", "Fireaspect", "Channeling", "Sweeping", "Thorns", "Baneofarthropods", "Respiration", "Riptide", "Silktouch", "Projectileprotection", "Impaling", "Featherfalling", "Power", "Infinity", "Glowing", "Piercing", "Multishot", "Quickcharge", "Soulspeed", "Swiftsneak", "Sweepingedge", "Density", "Breach" and "Windburst"
+        set tab completions for position 2 to {_enchants::*}
+        set tab completions for position 3 to "1", "2", "3", "4" and "5"
+
+on tab complete of "/serveritem":
+    set tab completions for position 1 to "save", "give", "del", "buy", "take", "sell", "setnick" and "list"
+
+    if any of tab arg-1 is "give", "buy", "setnick", "sell", "take" or "del":
+        set {_names::*} to indices of {serveritems::*}
+        set tab completions for position 2 to {_names::*}
+
+    if tab arg-1 is "give":
+        set tab completions for position 3 to all players
+        set tab completions for position 4 to "1", "4", "8", "16", "32" and "64"
+
+    if tab arg-1 is "take":
+        set tab completions for position 3 to all players
+        set tab completions for position 4 to "1", "4", "8", "16", "32" and "64"
+
+    if tab arg-1 is "sell":
+        set tab completions for position 3 to "10", "50", "100", "500" and "1000"
+
+    if tab arg-1 is "buy":
+        set tab completions for position 4 to all players

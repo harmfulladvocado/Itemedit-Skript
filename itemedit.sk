@@ -3,7 +3,12 @@
 # MADE BY: hrmfullAdvocado
 # DEPENDENCIES: Skript, SkBee
 # =====================================
-
+function removeUnderscores(t: text) :: text:
+    set {_modified} to {_t}
+    replace all "_" in {_modified} with " "
+    return {_modified}
+on load:
+    delete {itemedit::*}
 # ---------- ITEMEDIT COMMAND ----------
 command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
     aliases: /itemedit
@@ -14,22 +19,21 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
 # ---------- RENAMING ----------
 
         if arg-1 is "rename":
-            if arg-2 isn't set:
-                set name of player's tool to ""
-                stop
             if arg-2 is "-clear":
                 set name of player's tool to ""
                 stop
-            if player's tool is air:
-                send "&cYou must be holding an item to rename it." to player
-                stop
-            else:
-                set {_name} to "%arg-2% %arg-3% %arg-4% %arg-5% %arg-6%"
-                replace all "<none>" in {_name} with ""
-                set {_colored} to colored {_name}
-                set name of player's tool to {_colored}
-                send "&aItem renamed to &r%{_colored}%&a" to player
-                stop
+            if player's tool is not air:
+                if arg-2 is set:
+                    if arg-3 isn't set:
+                        set name of player's tool to "arg-2"
+                    else if arg-4 isn't set:
+                        set name of player's tool to "%colored arg-2% %colored arg-3%"
+                    else if arg-5 isn't set:
+                        set name of player's tool to "%colored arg-2% %colored arg-3% %colored arg-4%"
+                    else if arg-6 isn't set:
+                        set name of player's tool to "%colored arg-2% %colored arg-3% %colored arg-4% %colored arg-5%"
+                    else:
+                        set name of player's tool to "%colored arg-2% %colored arg-3% %colored arg-4% %colored arg-5% %colored arg-6%"
 
 # ---------- LORE ----------
 
@@ -38,30 +42,18 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                 if player's tool is air:
                     send "&cYou must be holding an item to set its lore." to player
                     stop
-                if arg-3 is not set:
+                if arg-3 isn't set:
                     send "&cPlease specify a lore line to add." to player
                     stop
-                add colored "&r%arg-3%" to lore of player's tool
+                if arg-4 isn't set:
+                    add colored "&r%arg-3%" to lore of player's tool
+                else if arg-5 isn't set:
+                    add colored "&r%arg-3% %arg-4%" to lore of player's tool
+                else if arg-6 isn't set:
+                    add colored "&r%arg-3% %arg-4% %arg-5%" to lore of player's tool
+                else:
+                    add colored "&r%arg-3% %arg-4% %arg-5% %arg-6%" to lore of player's tool
                 send "&aLore line added to item." to player
-
-
-
-            if arg-2 is "set":
-                if tool of player is air:
-                    send "&cYou must be holding an item to set its lore." to player
-                    stop
-                if arg-3 is not set:
-                    send "&cPlease specify the line number to set." to player
-                    stop
-                if arg-4 is not set:
-                    send "&cPlease specify the lore text." to player
-                    stop
-                set {_lore::*} to lore of tool of player
-                set {_lore::%arg-3%} to colored "&r%arg-4%"
-                set lore of tool of player to {_lore::*}
-                send "&aSet lore line %arg-3% to &f%arg-4%&a."
-
-
 
             if arg-2 is "remove":
                 if tool of player is air:
@@ -76,8 +68,7 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                 send "&aRemoved lore line %arg-3% from your item."
 
 
-
-            if arg-2 is "reset":
+            if arg-2 is "clear":
                 if player's tool is air:
                     send "&cYou must be holding an item to reset its lore." to player
                     stop
@@ -88,7 +79,7 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
 # ---------- UNBREAKABLE ----------
 
         if arg-1 is "unbreakable":
-            if arg-2 is not set:
+            if arg-2 isn't set:
                 set player's tool to unbreakable tool
             else if arg-2 is "true":
                 set player's tool to unbreakable tool
@@ -107,10 +98,10 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
             if player's tool is not set:
                 send "&cYou must be holding an item to set its amount." to player
                 stop
-            if arg-2 <= 0:
+            if arg-2 parsed as number <= 0:
                 send "&cInvalid amount. Please enter a number between 1 and 99." to player
                 stop
-            if arg-2 > 99:
+            if arg-2 parsed as number > 99:
                 send "&cInvalid amount. Maximum stack size is 99." to player
                 stop
             set amount of player's tool to arg-2 parsed as number
@@ -122,51 +113,52 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
             if arg-2 is not set:
                 send "&cPlease specify a maximum stack size." to player
                 stop
-            if {_arg-2} is not a number:
+            if arg-2 is not a number:
                 send "&cInvalid maximum stack size. Please enter a number." to player
                 stop
-            if {_arg-2} <= 0:
+            if arg-2 parsed as number <= 0:
                 send "&cInvalid maximum stack size. Please enter a number between 1 and 99." to player
                 stop
-            if {_arg-2} > 99:
+            if arg-2 parsed as number > 99:
                 send "&cInvalid maximum stack size. Maximum stack size is 99." to player
                 stop
             set max stack size of player's tool to arg-2 parsed as number
-            send "&aItem maximum stack size set to &f%{_arg-2}%&a." to player
+            send "&aItem maximum stack size set to &f%arg-2%&a." to player
 
 
-# ---------- ENCHANT ----------
+        # ---------- ENCHANT ----------
 
         if arg-1 is "enchant":
-            set {_arg-2} to arg-2
-            set {_arg-3} to arg-3 parsed as number
-            if {_arg-3} is "<none>":
-                send "&cYou must specify a valid enchantment level." to player
+            set {_level} to arg-3
+            if player's tool is air:
+                send "&cYou must hold an item to enchant." to player
                 stop
-            else:
-                set {_enchant} to "%{_arg-2}% %{_arg-3}%" parsed as enchantment type
-                if {_enchant} is not set:
-                    send "&cThat is not a valid enchantment." to player
-                    stop
-                enchant player's tool with {_enchant}
-                send "&aApplied enchantment %{_arg-2}% level %{_arg-3}% to your item." to player
 
+            if arg-2 is "-clear":
+                disenchant player's tool
+                send "&aAll enchantments have been removed from your item." to player
+                stop
+            set {_enchant} to removeUnderscores(arg-2)
+            if {_enchant} isn't set:
+                send "&c%arg-2% is not a valid enchantment." to player
+                stop
+            enchant player's tool with "%{_enchant}% %{_level}%" parsed as enchantment type
+            send "&aApplied enchantment &f%{_enchant}% &a at level &f%{_level}% &ato your item." to player
 
 # ---------- DURABILITY ----------
 
         if arg-1 is "durability":
-            set {_arg-2} to arg-2 parsed as number
             if arg-2 is not set:
                 send "&cPlease specify a durability value." to player
                 stop
-            if {_arg-2} is not a number:
+            if arg-2 is not a number:
                 send "&cInvalid durability value. Please enter a number." to player
                 stop
             if player's tool is not set:
                 send "&cYou must be holding an item to set its durability." to player
                 stop
-            set durability of player's tool to {_arg-2}
-            send "&aItem durability set to &f%{_arg-2}%&a." to player
+            set durability of player's tool to arg-2 parsed as number
+            send "&aItem durability set to &f%arg-2%&a." to player
 
 # ---------- FIRERESISTENT ----------
 
@@ -208,7 +200,6 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
 
 # ---------- POTIONEFFECT ----------
         if arg-1 is "potioneffect":
-            # require holding a potion / splash / lingering / water bottle
             if player's tool is not potion:
                 if player's tool is not splash potion:
                     if player's tool is not lingering potion:
@@ -347,25 +338,22 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
 # ---------- HIDE ----------
 
         if arg-1 is "hide":
-            set {arg-3} to arg-3
-            if arg-3 isn't set:
-                set {arg-3} to "true"
             if player's tool is set:
                 set {_item} to player's tool
                 if arg-2 is "enchants":
-                    if {arg-3} is "true":
+                    if arg-3 is "true":
                         add hide enchantments to item flags of player's tool
-                    else if {arg-3} is "false":
+                    else if arg-3 is "false":
                         remove hide enchantments from item flags of player's tool
                 if arg-2 is "attributes":
-                    if {arg-3} is "true":
+                    if arg-3 is "true":
                         add hide attributes to item flags of player's tool
-                    else if {arg-3} is "false":
+                    else if arg-3 is "false":
                         remove hide attributes from item flags of player's tool
                 if arg-2 is "Unbreakable":
-                    if {arg-3} is "true":
+                    if arg-3 is "true":
                         add hide unbreakable to item flags of player's tool
-                    else if {arg-3} is "false":
+                    else if arg-3 is "false":
                         remove hide unbreakable from item flags of player's tool
 
 # ---------- HIDEALL ----------
@@ -390,10 +378,9 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
 # ---------- REPAIRCOST ----------
 
         if arg-1 is "repaircost":
-            set {arg-2} to arg-2
             if arg-2 is set:
                 delete repair cost component of {_item}
-                set repair cost component of player's tool to {arg-2}
+                set repair cost component of player's tool to arg-2 parsed as number
 
 # ---------- LEATHERCOLOR ----------
 
@@ -840,7 +827,7 @@ on tab complete of "/ie" and "/itemedit":
 # ---------- ENCHANT TAB COMPLETION ----------
 
     if tab arg-1 is "enchant":
-        set {_enchants::*} to "Fireprotection", "Sharpness", "Flame", "Aquaaffinity", "Punch", "Loyalty", "Depthstrider", "Vanishingcurse", "Unbreaking", "Knockback", "Luckofthesea", "Bindingcurse", "Fortune", "Protection", "Efficiency", "Mending", "Frostwalker", "Lure", "Looting", "Blastprotection", "Smite", "Fireaspect", "Channeling", "Sweeping", "Thorns", "Baneofarthropods", "Respiration", "Riptide", "Silktouch", "Projectileprotection", "Impaling", "Featherfalling", "Power", "Infinity", "Glowing", "Piercing", "Multishot", "Quickcharge", "Soulspeed", "Swiftsneak", "Sweepingedge", "Density", "Breach" and "Windburst"
+        set {_enchants::*} to "-clear", "Fireprotection", "Sharpness", "Flame", "aqua_affinity", "Punch", "Loyalty", "Depth_strider", "Vanishing_curse", "Unbreaking", "Knockback", "Luck_of_thesea", "Binding_curse", "Fortune", "Protection", "Efficiency", "Mending", "Frost_walker", "Lure", "Looting", "Blast_protection", "Smite", "Fire_aspect", "Channeling", "Sweeping", "Thorns", "Bane_of_arthropods", "Respiration", "Riptide", "Silk_touch", "Projectile_protection", "Impaling", "Feather_falling", "Power", "Infinity", "Glowing", "Piercing", "Multishot", "Quick_charge", "Soul_speed", "Swift_sneak", "Sweeping_edge", "Density", "Breach" and "Windburst"
         set tab completions for position 2 to {_enchants::*}
         set tab completions for position 3 to "1", "2", "3", "4" and "5"
 

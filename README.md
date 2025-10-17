@@ -1,5 +1,4 @@
 # Itemedit-Skript
-Itemedit In Skript
 permission of plugin owner:
 https://discord.com/channels/438120634640498690/815511174686572586/1412093889434882188
 

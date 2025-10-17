@@ -3,9 +3,8 @@ permission of plugin owner:
 https://discord.com/channels/438120634640498690/815511174686572586/1412093889434882188
 
 this is a skript version of itemedit it has:
-attributes, rename, potioneffect, leathercolor, compass, bookauthor, unbreakable, amount, maxstacksize, enchant, durability, fireresistent, glow, fireworkpower, hideall, hide, repaircost, skullowner, spawnegg and lore
-also serveritem so you can save items and give it to people
-tab completion and messages
+
+attributes, rename, potioneffect, leathercolor, compass, bookauthor, unbreakable, amount, maxstacksize, enchant, durability, fireresistent, glow, fireworkpower, hideall, hide, repaircost, skullowner, spawnegg, lore, serveritem, tab completion and messages
 
 DISCORD:
 https://discord.gg/gmyNJMRZfJ

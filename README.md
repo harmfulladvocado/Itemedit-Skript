@@ -2,6 +2,10 @@
 permission of plugin owner:
 https://discord.com/channels/438120634640498690/815511174686572586/1412093889434882188
 
+Dependencies:
+
+Skript, Skbee and Skcrew
+
 this is a skript version of itemedit it has:
 
 attributes, rename, potioneffect, leathercolor, compass, bookauthor, unbreakable, amount, maxstacksize, enchant, durability, fireresistent, glow, fireworkpower, hideall, hide, repaircost, skullowner, spawnegg, lore, serveritem, tab completion and messages

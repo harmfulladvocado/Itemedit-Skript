@@ -8,7 +8,7 @@ Skript, Skbee and Skcrew
 
 this is a skript version of itemedit it has:
 
-attributes, rename, potioneffect, leathercolor, compass, bookauthor, unbreakable, amount, maxstacksize, enchant, durability, fireresistent, glow, fireworkpower, hideall, hide, repaircost, skullowner, spawnegg, lore, serveritem, tab completion and messages
+attributes, rename, potioneffect, leathercolor, compass, bookauthor, unbreakable, amount, maxstacksize, enchant, durability, fireresistent, glow, fireworkpower, hideall, hide, repaircost, skullowner, spawnegg, lore, itemmodel, itemtype, serveritem, tab completion and messages
 
 DISCORD:
 https://discord.gg/gmyNJMRZfJ

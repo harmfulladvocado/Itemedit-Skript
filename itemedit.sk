@@ -7,8 +7,19 @@ function removeUnderscores(t: text) :: text:
     set {_modified} to {_t}
     replace all "_" in {_modified} with " "
     return {_modified}
+
 on load:
     delete {itemedit::*}
+    delete {_enchant}
+    delete {_nbt}
+    delete {_item}
+    delete {_raw::*}
+    delete {pe::*}
+    delete {_attr}
+    delete {_amount}
+    delete {_target}
+
+
 # ---------- ITEMEDIT COMMAND ----------
 command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
     aliases: /itemedit
@@ -26,15 +37,9 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                 stop
             if arg-2 is set:
                 if arg-3 isn't set:
-                    set name of player's tool to "arg-2"
-                else if arg-4 isn't set:
-                    set name of player's tool to "%colored arg-2% %colored arg-3%"
-                else if arg-5 isn't set:
-                    set name of player's tool to "%colored arg-2% %colored arg-3% %colored arg-4%"
-                else if arg-6 isn't set:
-                    set name of player's tool to "%colored arg-2% %colored arg-3% %colored arg-4% %colored arg-5%"
+                    set name of player's tool to arg-2
                 else:
-                    set name of player's tool to "%colored arg-2% %colored arg-3% %colored arg-4% %colored arg-5% %colored arg-6%"
+                    set name of player's tool to "%arg-2% %arg-3% %arg-4% %arg-5% %arg-6%"
 
 # ---------- LORE ----------
 
@@ -45,10 +50,6 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                     stop
                 if arg-4 isn't set:
                     add colored "&f%arg-3%" to lore of player's tool
-                else if arg-5 isn't set:
-                    add colored "&f%arg-3% %arg-4%" to lore of player's tool
-                else if arg-6 isn't set:
-                    add colored "&f%arg-3% %arg-4% %arg-5%" to lore of player's tool
                 else:
                     add colored "&f%arg-3% %arg-4% %arg-5% %arg-6%" to lore of player's tool
                 send "&aLore line added to item." to player
@@ -71,21 +72,16 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
 # ---------- UNBREAKABLE ----------
 
         if arg-1 is "unbreakable":
-            if arg-2 isn't set:
-                set player's tool to unbreakable tool
-            else if arg-2 is "true":
-                set player's tool to unbreakable tool
-            else if arg-2 is "false":
+            if arg-2 is "false":
                 set player's tool to breakable tool
+            else:
+                set player's tool to unbreakable tool
 
 # ---------- AMOUNT ----------
 
         if arg-1 is "amount":
             if arg-2 is not set:
                 send "&cPlease specify an amount." to player
-                stop
-            if arg-2 is not a number:
-                send "&cInvalid amount. Please enter a number." to player
                 stop
             if arg-2 parsed as number <= 0:
                 send "&cInvalid amount. Please enter a number between 1 and 99." to player
@@ -102,9 +98,6 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
             if arg-2 is not set:
                 send "&cPlease specify a maximum stack size." to player
                 stop
-            if arg-2 is not a number:
-                send "&cInvalid maximum stack size. Please enter a number." to player
-                stop
             if arg-2 parsed as number <= 0:
                 send "&cInvalid maximum stack size. Please enter a number between 1 and 99." to player
                 stop
@@ -114,11 +107,21 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
             set max stack size of player's tool to arg-2 parsed as number
             send "&aItem maximum stack size set to &f%arg-2%&a." to player
 
+# ---------- ITEMMODEL ----------
+
+        if arg-1 is "itemmodel":
+            set item model of {_item} to "minecraft:%arg-2%"
+            set player's tool to {_item}
+
+# ---------- TYPE ----------
+
+        if arg-1 is "type":
+            set {_amount} to amount of player's held item
+            set player's held item to arg-2 parsed as item
+            set amount of player's held item to {_amount}
 
 # ---------- ENCHANT ----------
         if arg-1 is "enchant":
-            set {_level} to arg-3
-
             if arg-2 is "-clear":
                 disenchant player's tool
                 send "&aAll enchantments have been removed from your item." to player
@@ -127,8 +130,8 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
             if {_enchant} isn't set:
                 send "&c%arg-2% is not a valid enchantment." to player
                 stop
-            enchant player's tool with "%{_enchant}% %{_level}%" parsed as enchantment type
-            send "&aApplied enchantment &f%{_enchant}% &a at level &f%{_level}% &ato your item." to player
+            enchant player's tool with "%{_enchant}% %arg-3%" parsed as enchantment type
+            send "&aApplied enchantment &f%{_enchant}% &a at level &f%arg-3% &ato your item." to player
 
 # ---------- DURABILITY ----------
 
@@ -145,29 +148,24 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
             if arg-2 is not set:
                 send "&cPlease specify a max durability value." to player
                 stop
-            if arg-2 is not a number:
-                send "&cInvalid max durability value. Please enter a number." to player
-                stop
             set max durability of player's tool to arg-2 parsed as a number
             send "&aMax Item durability set to &f%arg-2%&a." to player
 
 # ---------- FIRERESISTENT ----------
 
         if arg-1 is "fireresistent":
-            if arg-2 is "true":
-                make player's tool fire resistant
-            else if arg-2 is "false":
+            if arg-2 is "false":
                 make player's tool not fire resistant
             else:
-                send "&cInvalid value. Please specify true or false." to player 
+                make player's tool fire resistant
                 
 # ---------- GLOW ----------
 
         if arg-1 is "glow":
-            if arg-2 is "true":
-                force the player's tool to start glinting
-            else if arg-2 is "false":
+            if arg-2 is "false":
                 force the player's tool to stop glinting
+            else:
+                force the player's tool to start glinting
 
 # ---------- FIREWORKPOWER ----------
 
@@ -179,11 +177,10 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                 send "&cInvalid firework power value. Please enter a number." to player
                 stop
             set {_nbt} to nbt compound of {_item}
-            set {_flight} to arg-2 parsed as integer
-            set byte tag "minecraft:fireworks;flight_duration" of {_nbt} to {_flight}
+            set byte tag "minecraft:fireworks;flight_duration" of {_nbt} to arg-2 parsed as integer
             set {_item} to {_item} with nbt {_nbt}
             set player's tool to {_item}
-            send "&aFirework power set to &f%{_flight}%&a." to player
+            send "&aFirework power set to &f%arg-2 parsed as integer%&a." to player
 
 
 # ---------- POTIONEFFECT ----------
@@ -201,11 +198,9 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                     send "&cUsage: /potion potioneffect add <effect> <level> <amount> <s/m/h>" to player
                     stop
 
-                # normalize effect input
                 set {_raw::%uuid of player%} to lower case arg-3
                 replace all "_" with " " in {_raw::%uuid of player%}
 
-                # aliases
                 if {_raw::%uuid of player%} is "harming":
                     set {_raw::%uuid of player%} to "instant damage"
                 if {_raw::%uuid of player%} is "instant damage":
@@ -228,7 +223,6 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                     send "&cUnknown potion effect: %arg-3%." to player
                     stop
 
-                # parse level (tier)
                 if arg-4 is set:
                     set {pe::%uuid of player%::level} to arg-4 parsed as number
                     if {pe::%uuid of player%::level} < 1:
@@ -236,7 +230,6 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                 else:
                     set {pe::%uuid of player%::level} to 1
 
-                # parse duration: <amount> <unit>
                 if arg-5 is set:
                     if arg-6 is set:
                         set {pe::%uuid of player%::amount} to arg-5 parsed as number
@@ -270,7 +263,6 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                         if {tmpunit::%uuid of player%} is "hours":
                             set {pe::%uuid of player%::duration} to {pe::%uuid of player%::amount} * 1 hour
 
-                        # final check
                         if {pe::%uuid of player%::duration} is not set:
                             send "&cUnknown time unit: %arg-6% (use s/m/h)." to player
                             stop
@@ -280,15 +272,12 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                 else:
                     set {pe::%uuid of player%::duration} to 30 seconds
 
-                # create the new potion effect object
                 set {peobj::%uuid of player%} to new potion effect of {pe::%uuid of player%} potion of tier {pe::%uuid of player%::level} for {pe::%uuid of player%::duration}
 
-                # check if potion already has this effect → remove by type
                 loop potion effects of player's tool:
                     if type of loop-value is {pe::%uuid of player%}:
                         remove loop-value from potion effects of player's tool
 
-                # now add the new effect
                 add {peobj::%uuid of player%} to potion effects of player's tool
 
                 send "&aSet %arg-3% to level %{pe::%uuid of player%::level}% for %{pe::%uuid of player%::duration}% on your held potion."
@@ -309,7 +298,6 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                     send "&cUnknown effect: %{raw::%uuid of player%}%." to player
                     stop
 
-                # loop remove to make sure we get the right type
                 loop potion effects of player's tool:
                     if type of loop-value is {type::%uuid of player%}:
                         remove loop-value from potion effects of player's tool
@@ -326,49 +314,36 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
 # ---------- HIDE ----------
         if arg-1 is "hide":
             if arg-2 is "enchantments":
-                if arg-3 is "true":
-                    add hide enchantments to item flags of player's tool
-                if arg-3 isn't set:
-                    add hide enchantments to item flags of player's tool
                 if arg-3 is "false":
                     remove hide enchantments from item flags of player's tool
+                else:
+                    add hide enchantments to item flags of player's tool
 
             if arg-2 is "attributes":
-                if arg-3 is "true":
-                    add hide attributes to item flags of player's tool
-                if arg-3 isn't set:
-                    add hide attributes to item flags of player's tool
                 if arg-3 is "false":
                     remove hide attributes from item flags of player's tool
+                else:
+                    add hide attributes to item flags of player's tool
 
             if arg-2 is "unbreakable":
-                if arg-3 is "true":
-                    add hide unbreakable to item flags of player's tool
-                if arg-3 isn't set:
-                    add hide unbreakable to item flags of player's tool
                 if arg-3 is "false":
                     remove hide unbreakable from item flags of player's tool
+                else:
+                    add hide unbreakable to item flags of player's tool
 
             send "&aItem flags updated successfully." to player
 
 # ---------- HIDEALL ----------
 
         if arg-1 is "hideall":
-            if arg-2 isn't set:
-                add hide unbreakable to item flags of player's tool
-                add hide attributes to item flags of player's tool
-                add hide enchantments to item flags of player's tool
-
-            if arg-2 is "true":
-                add hide unbreakable to item flags of player's tool
-                add hide attributes to item flags of player's tool
-                add hide enchantments to item flags of player's tool
-
             if arg-2 is "false":
                 remove hide unbreakable from item flags of player's tool
                 remove hide attributes from item flags of player's tool
                 remove hide enchantments from item flags of player's tool
-
+            else:
+                add hide unbreakable to item flags of player's tool
+                add hide attributes to item flags of player's tool
+                add hide enchantments to item flags of player's tool
 
 # ---------- REPAIRCOST ----------
 
@@ -380,13 +355,8 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
 # ---------- LEATHERCOLOR ----------
 
         if arg-1 is "leathercolor":
-            set {_color} to arg-2 parsed as color
-            if {_color} is set:
-                dye player's tool {_color}
-                send "&aLeather color set to %{_color}%!" to player
-            else:
-                send "&cThat is not a valid leather color." to player
-
+            dye player's tool arg-2 parsed as color
+            send "&aLeather color set to %arg-2 parsed as color%!" to player
 
 # ---------- SKULLOWNER ----------
 
@@ -407,12 +377,8 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                 if arg-2 is "Snow_Golem":
                     set player's tool to snow golem spawn egg
                 else:
-                    set {_entity_type} to arg-2 parsed as entity type
-                    set {_item} to "%{_entity_type}% spawn egg" parsed as item type
-                    if {_item} is not air:
-                        set player's tool to {_item}
-                    else:
-                        send "&cInvalid entity type or spawn egg not found." to player
+                    set {_item} to "%arg-2 parsed as entity type% spawn egg" parsed as item type
+                    set player's tool to {_item}
 
 
 
@@ -738,7 +704,7 @@ on inventory click:
 # =====================================
 
 on tab complete of "/ie" and "/itemedit":
-    set tab completions for position 1 to "rename", "maxdurability", "glider", "potioneffect", "leathercolor", "attribute", "compass",  "bookauthor", "unbreakable", "amount", "maxstacksize", "enchant", "durability", "fireresistent", "glow", "fireworkpower", "hideall", "hide", "repaircost", "skullowner", "spawnegg" and "lore"
+    set tab completions for position 1 to "rename", "maxdurability", "glider", "type", "itemmodel", "potioneffect", "leathercolor", "attribute", "compass",  "bookauthor", "unbreakable", "amount", "maxstacksize", "enchant", "durability", "fireresistent", "glow", "fireworkpower", "hideall", "hide", "repaircost", "skullowner", "spawnegg" and "lore"
 
 # ---------- POTIONEFFECT TAB COMPLETION ----------
 
@@ -762,6 +728,12 @@ on tab complete of "/ie" and "/itemedit":
 
     if tab arg-1 is "spawnegg":
         set tab completions for position 2 to "Allay", "Armadillo", "Axolotl", "Bat", "Bee", "Blaze", "Bogged", "Breeze", "Camel", "Cat", "Chicken", "Creeper", "Dolphin", "Donkey", "Drowned", "Enderman", "Endermite", "Evoker", "Fox", "Goat", "Guardian", "Horse", "Husk", "Illusioner", "Llama", "Mooshroom", "Mule", "Ocelot", "Panda", "Parrot", "Phantom", "Pig", "Piglin", "Pillager", "Pufferfish", "Rabbit", "Ravager", "Salmon", "Sheep", "Skeleton", "Slime", "Snow_Golem", "Spider", "Stray", "Turtle", "Vex", "Vindicator", "Warden", "Witch", "Wither", "Wolf", and "Zombie"
+
+# ---------- ITEMMODEL TAB COMPLETION ----------
+
+    if tab arg-1 is "itemmodel" and "type":
+        set tab completions for position 2 to "air", "stone", "granite", "polished_granite", "diorite", "polished_diorite", "andesite", "polished_andesite", "grass_block", "dirt", "coarse_dirt", "podzol", "cobblestone", "oak_planks", "spruce_planks", "birch_planks", "jungle_planks", "acacia_planks", "dark_oak_planks", "mangrove_planks", "cherry_planks", "bamboo_planks", "crimson_planks", "warped_planks", "oak_sapling", "spruce_sapling", "birch_sapling", "jungle_sapling", "acacia_sapling", "dark_oak_sapling", "mangrove_propagule", "cherry_sapling", "bedrock", "sand", "suspicious_sand", "red_sand", "gravel", "coal_ore", "deepslate_coal_ore", "iron_ore", "deepslate_iron_ore", "copper_ore", "deepslate_copper_ore", "gold_ore", "deepslate_gold_ore", "redstone_ore", "deepslate_redstone_ore", "emerald_ore", "deepslate_emerald_ore", "lapis_ore", "deepslate_lapis_ore", "diamond_ore", "deepslate_diamond_ore", "nether_gold_ore", "nether_quartz_ore", "ancient_debris", "coal_block", "iron_block", "copper_block", "gold_block", "redstone_block", "emerald_block", "lapis_block", "diamond_block", "netherite_block", "exposed_copper", "weathered_copper", "oxidized_copper", "cut_copper", "exposed_cut_copper", "weathered_cut_copper", "oxidized_cut_copper", "waxed_copper_block", "waxed_exposed_copper", "waxed_weathered_copper", "waxed_oxidized_copper", "waxed_cut_copper", "waxed_exposed_cut_copper", "waxed_weathered_cut_copper", "waxed_oxidized_cut_copper", "oak_log", "spruce_log", "birch_log", "jungle_log", "acacia_log", "dark_oak_log", "mangrove_log", "cherry_log", "bamboo_block", "crimson_stem", "warped_stem", "stripped_oak_log", "stripped_spruce_log", "stripped_birch_log", "stripped_jungle_log", "stripped_acacia_log", "stripped_dark_oak_log", "stripped_mangrove_log", "stripped_cherry_log", "stripped_bamboo_block", "stripped_crimson_stem", "stripped_warped_stem", "oak_wood", "spruce_wood", "birch_wood", "jungle_wood", "acacia_wood", "dark_oak_wood", "mangrove_wood", "cherry_wood", "crimson_hyphae", "warped_hyphae", "stripped_oak_wood", "stripped_spruce_wood", "stripped_birch_wood", "stripped_jungle_wood", "stripped_acacia_wood", "stripped_dark_oak_wood", "stripped_mangrove_wood", "stripped_cherry_wood", "stripped_crimson_hyphae", "stripped_warped_hyphae", "oak_leaves", "spruce_leaves", "birch_leaves", "jungle_leaves", "acacia_leaves", "dark_oak_leaves", "mangrove_leaves", "cherry_leaves", "azalea_leaves", "flowering_azalea_leaves", "moss_carpet", "moss", "spore_blossom", "big_dripleaf", "small_dripleaf", "hanging_roots", "vines", "glow_lichen", "grass", "fern", "dead_bush", "tall_grass", "large_fern", "lily_pad", "seagrass", "kelp", "kelp_plant", "bamboo", "sweet_berry_bush", "sugar_cane", "cactus", "torch", "wall_torch", "soul_torch", "soul_wall_torch", "ladder", "scaffolding", "composter", "barrel", "chest", "trapped_chest", "ender_chest", "jukebox", "note_block", "music_disc_player", "dispenser", "dropper", "piston", "sticky_piston", "tnt", "piston_head", "moving_piston", "fire", "soul_fire", "oak_stairs", "spruce_stairs", "birch_stairs", "jungle_stairs", "acacia_stairs", "dark_oak_stairs", "mangrove_stairs", "cherry_stairs", "crimson_stairs", "warped_stairs", "cobblestone_stairs", "brick_stairs", "stone_brick_stairs", "nether_brick_stairs", "sandstone_stairs", "red_sandstone_stairs", "purpur_stairs", "quartz_stairs", "andesite_stairs", "polished_andesite_stairs", "diorite_stairs", "polished_diorite_stairs", "granite_stairs", "polished_granite_stairs", "stone_brick_stairs", "mossy_stone_brick_stairs", "smooth_sandstone_stairs", "red_sandstone_stairs", "smooth_red_sandstone_stairs", "cut_sandstone_stairs", "cut_red_sandstone_stairs", "brick_stairs", "nether_brick_stairs", "quartz_stairs", "purpur_stairs", "prismarine_stairs", "prismarine_brick_stairs", "dark_prismarine_stairs", "polished_blackstone_stairs", "polished_blackstone_brick_stairs", "stone", "granite", "polished_granite", "diorite", "polished_diorite", "andesite", "polished_andesite", "sandstone", "cut_sandstone", "smooth_sandstone", "red_sandstone", "cut_red_sandstone", "smooth_red_sandstone", "cobblestone", "mossy_cobblestone", "brick_block", "stone_bricks", "mossy_stone_bricks", "cracked_stone_bricks", "chiseled_stone_bricks", "nether_bricks", "red_nether_bricks", "chiseled_nether_bricks", "quartz_block", "chiseled_quartz_block", "pillars_quartz_block", "purpur_block", "purpur_pillar", "end_stone_bricks", "beacon", "anvil", "chipped_anvil", "damaged_anvil", "enchanting_table", "end_portal_frame", "end_stone", "dragon_egg", "sand", "red_sand", "gravel", "gold_block", "iron_block", "diamond_block", "emerald_block", "netherite_block", "lapis_block", "redstone_block", "coal_block", "clay", "terracotta", "white_terracotta", "orange_terracotta", "magenta_terracotta", "light_blue_terracotta", "yellow_terracotta", "lime_terracotta", "pink_terracotta", "gray_terracotta", "light_gray_terracotta", "cyan_terracotta", "purple_terracotta", "blue_terracotta", "brown_terracotta", "green_terracotta", "red_terracotta", "black_terracotta", "white_wool", "orange_wool", "magenta_wool", "light_blue_wool", "yellow_wool", "lime_wool", "pink_wool", "gray_wool", "light_gray_wool", "cyan_wool", "purple_wool", "blue_wool", "brown_wool", "green_wool", "red_wool", "black_wool", "white_concrete", "orange_concrete", "magenta_concrete", "light_blue_concrete", "yellow_concrete", "lime_concrete", "pink_concrete", "gray_concrete", "light_gray_concrete", "cyan_concrete", "purple_concrete", "blue_concrete", "brown_concrete", "green_concrete", "red_concrete", "black_concrete", "white_concrete_powder", "orange_concrete_powder", "magenta_concrete_powder", "light_blue_concrete_powder", "yellow_concrete_powder", "lime_concrete_powder", "pink_concrete_powder", "gray_concrete_powder", "light_gray_concrete_powder", "cyan_concrete_powder", "purple_concrete_powder", "blue_concrete_powder", "brown_concrete_powder", "green_concrete_powder", "red_concrete_powder", "black_concrete_powder", "glass", "white_stained_glass", "orange_stained_glass", "magenta_stained_glass", "light_blue_stained_glass", "yellow_stained_glass", "lime_stained_glass", "pink_stained_glass", "gray_stained_glass", "light_gray_stained_glass", "cyan_stained_glass", "purple_stained_glass", "blue_stained_glass", "brown_stained_glass", "green_stained_glass", "red_stained_glass", "black_stained_glass", "glass_pane", "white_stained_glass_pane", "orange_stained_glass_pane", "magenta_stained_glass_pane", "light_blue_stained_glass_pane", "yellow_stained_glass_pane", "lime_stained_glass_pane", "pink_stained_glass_pane", "gray_stained_glass_pane", "light_gray_stained_glass_pane", "cyan_stained_glass_pane", "purple_stained_glass_pane", "blue_stained_glass_pane", "brown_stained_glass_pane", "green_stained_glass_pane", "red_stained_glass_pane", "black_stained_glass_pane", "white_glazed_terracotta", "orange_glazed_terracotta", "magenta_glazed_terracotta", "light_blue_glazed_terracotta", "yellow_glazed_terracotta", "lime_glazed_terracotta", "pink_glazed_terracotta", "gray_glazed_terracotta", "light_gray_glazed_terracotta", "cyan_glazed_terracotta", "purple_glazed_terracotta", "blue_glazed_terracotta", "brown_glazed_terracotta", "green_glazed_terracotta", "red_glazed_terracotta", "black_glazed_terracotta", "stone_bricks", "mossy_stone_bricks", "cracked_stone_bricks", "chiseled_stone_bricks", "andesite", "polished_andesite", "diorite", "polished_diorite", "granite", "polished_granite", "sandstone", "cut_sandstone", "smooth_sandstone", "red_sandstone", "cut_red_sandstone", "smooth_red_sandstone", "prismarine", "prismarine_bricks", "dark_prismarine", "sea_lantern", "brick_block", "nether_bricks", "red_nether_bricks", "chiseled_nether_bricks", "quartz_block", "chiseled_quartz_block", "pillar_quartz_block", "purpur_block", "purpur_pillar", "end_stone", "end_stone_bricks", "magma_block", "nether_wart_block", "warped_wart_block", "soul_sand", "soul_soil", "basalt", "polished_basalt", "smooth_basalt", "blackstone", "polished_blackstone", "polished_blackstone_bricks", "chiseled_polished_blackstone", "gilded_blackstone", "candle", "white_candle", "orange_candle", "magenta_candle", "light_blue_candle", "yellow_candle", "lime_candle", "pink_candle", "gray_candle", "light_gray_candle", "cyan_candle", "purple_candle", "blue_candle", "brown_candle", "green_candle", "red_candle", "black_candle", "candle_cake", "white_candle_cake", "orange_candle_cake", "magenta_candle_cake", "light_blue_candle_cake", "yellow_candle_cake", "lime_candle_cake", "pink_candle_cake", "gray_candle_cake", "light_gray_candle_cake", "cyan_candle_cake", "purple_candle_cake", "blue_candle_cake", "brown_candle_cake", "green_candle_cake", "red_candle_cake", "black_candle_cake", "cake", "sugar_cane", "kelp", "kelp_plant", "seagrass", "tall_seagrass", "sea_pickle", "lily_pad", "vine", "glow_lichen", "cactus", "sweet_berry_bush", "bamboo", "bamboo_sapling", "scaffolding", "torch", "soul_torch", "wall_torch", "soul_wall_torch", "ladder", "composter", "barrel", "chest", "trapped_chest", "ender_chest", "jukebox", "note_block", "dispenser", "dropper", "piston", "sticky_piston", "tnt", "fire", "soul_fire", "lectern", "enchanting_table", "end_portal_frame", "beacon", "anvil", "chipped_anvil", "damaged_anvil", "lever", "stone_button", "polished_blackstone_button", "oak_button", "spruce_button", "birch_button", "jungle_button", "acacia_button", "dark_oak_button", "mangrove_button", "cherry_button", "bamboo_button", "crimson_button", "warped_button", "stone_pressure_plate", "polished_blackstone_pressure_plate", "light_weighted_pressure_plate", "heavy_weighted_pressure_plate", "oak_pressure_plate", "spruce_pressure_plate", "birch_pressure_plate", "jungle_pressure_plate", "acacia_pressure_plate", "dark_oak_pressure_plate", "mangrove_pressure_plate", "cherry_pressure_plate", "bamboo_pressure_plate", "crimson_pressure_plate", "warped_pressure_plate", "oak_door", "spruce_door", "birch_door", "jungle_door", "acacia_door", "dark_oak_door", "mangrove_door", "cherry_door", "bamboo_door", "crimson_door", "warped_door", "iron_door", "trapdoor", "oak_trapdoor", "spruce_trapdoor", "birch_trapdoor", "jungle_trapdoor", "acacia_trapdoor", "dark_oak_trapdoor", "mangrove_trapdoor", "cherry_trapdoor", "bamboo_trapdoor", "crimson_trapdoor", "warped_trapdoor", "iron_trapdoor", "fence", "oak_fence", "spruce_fence", "birch_fence", "jungle_fence", "acacia_fence", "dark_oak_fence", "mangrove_fence", "cherry_fence", "bamboo_fence", "crimson_fence", "warped_fence", "nether_brick_fence", "cobblestone_wall", "mossy_cobblestone_wall", "stone_brick_wall", "mossy_stone_brick_wall", "granite_wall", "diorite_wall", "andesite_wall", "sandstone_wall", "red_sandstone_wall", "brick_wall", "prismarine_wall", "red_nether_brick_wall", "nether_brick_wall", "blackstone_wall", "polished_blackstone_wall", "polished_blackstone_brick_wall", "end_stone_brick_wall", "fence_gate", "oak_fence_gate", "spruce_fence_gate", "birch_fence_gate", "jungle_fence_gate", "acacia_fence_gate", "dark_oak_fence_gate", "mangrove_fence_gate", "cherry_fence_gate", "bamboo_fence_gate", "crimson_fence_gate", "warped_fence_gate", "nether_brick_fence_gate", "iron_bars", "glass_pane", "white_glass_pane", "orange_glass_pane", "magenta_glass_pane", "light_blue_glass_pane", "yellow_glass_pane", "lime_glass_pane", "pink_glass_pane", "gray_glass_pane", "light_gray_glass_pane", "cyan_glass_pane", "purple_glass_pane", "blue_glass_pane", "brown_glass_pane", "green_glass_pane", "red_glass_pane", "black_glass_pane", "oak_slab", "spruce_slab", "birch_slab", "jungle_slab", "acacia_slab", "dark_oak_slab", "mangrove_slab", "cherry_slab", "bamboo_slab", "crimson_slab", "warped_slab", "stone_slab", "sandstone_slab", "cut_sandstone_slab", "smooth_sandstone_slab", "red_sandstone_slab", "cut_red_sandstone_slab", "smooth_red_sandstone_slab", "cobblestone_slab", "brick_slab", "stone_brick_slab", "mossy_stone_brick_slab", "nether_brick_slab", "red_nether_brick_slab", "quartz_slab", "purpur_slab", "prismarine_slab", "prismarine_brick_slab", "dark_prismarine_slab", "andesite_slab", "polished_andesite_slab", "diorite_slab", "polished_diorite_slab", "granite_slab", "polished_granite_slab", "blackstone_slab", "polished_blackstone_slab", "polished_blackstone_brick_slab", "cut_copper_slab", "exposed_cut_copper_slab", "weathered_cut_copper_slab", "oxidized_cut_copper_slab", "waxed_cut_copper_slab", "waxed_exposed_cut_copper_slab", "waxed_weathered_cut_copper_slab", "waxed_oxidized_cut_copper_slab", "white_carpet", "orange_carpet", "magenta_carpet", "light_blue_carpet", "yellow_carpet", "lime_carpet", "pink_carpet", "gray_carpet", "light_gray_carpet", "cyan_carpet", "purple_carpet", "blue_carpet", "brown_carpet", "green_carpet", "red_carpet", "black_carpet", "bed", "white_bed", "orange_bed", "magenta_bed", "light_blue_bed", "yellow_bed", "lime_bed", "pink_bed", "gray_bed", "light_gray_bed", "cyan_bed", "purple_bed", "blue_bed", "brown_bed", "green_bed", "red_bed", "black_bed", "banner", "white_banner", "orange_banner", "magenta_banner", "light_blue_banner", "yellow_banner", "lime_banner", "pink_banner", "gray_banner", "light_gray_banner", "cyan_banner", "purple_banner", "blue_banner", "brown_banner", "green_banner", "red_banner", "black_banner", "wall_banner", "white_wall_banner", "orange_wall_banner", "magenta_wall_banner", "light_blue_wall_banner", "yellow_wall_banner", "lime_wall_banner", "pink_wall_banner", "gray_wall_banner", "light_gray_wall_banner", "cyan_wall_banner", "purple_wall_banner", "blue_wall_banner", "brown_wall_banner", "green_wall_banner", "red_wall_banner", "black_wall_banner", "rail", "powered_rail", "detector_rail", "activator_rail", "minecart", "hopper_minecart", "chest_minecart", "furnace_minecart", "tnt_minecart", "oak_fence_gate", "spruce_fence_gate", "birch_fence_gate", "jungle_fence_gate", "acacia_fence_gate", "dark_oak_fence_gate", "mangrove_fence_gate", "cherry_fence_gate", "bamboo_fence_gate", "crimson_fence_gate", "warped_fence_gate", "iron_bars", "glass_pane", "white_glass_pane", "orange_glass_pane", "magenta_glass_pane", "light_blue_glass_pane", "yellow_glass_pane", "lime_glass_pane", "pink_glass_pane", "gray_glass_pane", "light_gray_glass_pane", "cyan_glass_pane", "purple_glass_pane", "blue_glass_pane", "brown_glass_pane", "green_glass_pane", "red_glass_pane", "black_glass_pane", "tripwire_hook", "tripwire", "daylight_detector", "daylight_detector_inverted", "scaffolding", "loom", "smithing_table", "fletching_table", "cartography_table", "grindstone", "stonecutter", "blast_furnace", "smoker", "campfire", "soul_campfire", "bell", "target", "sweet_berry_bush", "cactus", "melon", "pumpkin", "lit_pumpkin", "jack_o_lantern", "attached_pumpkin_stem", "attached_melon_stem", "pumpkin_stem", "melon_stem", "vine", "weeping_vines", "twisting_vines", "kelp", "kelp_plant", "seagrass", "tall_seagrass", "sea_pickle", "lily_pad", "candle", "white_candle", "orange_candle", "magenta_candle", "light_blue_candle", "yellow_candle", "lime_candle", "pink_candle", "gray_candle", "light_gray_candle", "cyan_candle", "purple_candle", "blue_candle", "brown_candle", "green_candle", "red_candle", "black_candle", "candle_cake", "white_candle_cake", "orange_candle_cake", "magenta_candle_cake", "light_blue_candle_cake", "yellow_candle_cake", "lime_candle_cake", "pink_candle_cake", "gray_candle_cake", "light_gray_candle_cake", "cyan_candle_cake", "purple_candle_cake", "blue_candle_cake", "brown_candle_cake", "green_candle_cake", "red_candle_cake", "black_candle_cake", "bee_nest", "beehive", "honey_block", "honeycomb_block", "brown_mushroom_block", "red_mushroom_block", "mushroom_stem", "mushroom", "mycelium", "podzol", "crimson_nylium", "warped_nylium", "nether_wart_block", "warped_wart_block", "shroomlight", "glowstone", "soul_sand", "soul_soil", "basalt", "polished_basalt", "smooth_basalt", "blackstone", "polished_blackstone", "polished_blackstone_bricks", "chiseled_polished_blackstone", "gilded_blackstone", "ancient_debris", "crying_obsidian", "respawn_anchor", "lodestone", "nether_gold_ore", "nether_quartz_ore", "nether_bricks", "red_nether_bricks", "chiseled_nether_bricks", "quartz_block", "chiseled_quartz_block", "pillar_quartz_block", "soul_campfire", "campfire", "chain", "iron_trapdoor", "light", "pointed_dripstone", "dripstone_block", "big_dripleaf", "small_dripleaf", "hanging_roots", "rooted_dirt", "moss_block", "moss_carpet", "azalea", "flowering_azalea", "flower_pot", "oak_sign", "spruce_sign", "birch_sign", "jungle_sign", "acacia_sign", "dark_oak_sign", "mangrove_sign", "cherry_sign", "bamboo_sign", "crimson_sign", "warped_sign", "wall_sign", "white_wall_sign", "orange_wall_sign", "magenta_wall_sign", "light_blue_wall_sign", "yellow_wall_sign", "lime_wall_sign", "pink_wall_sign", "gray_wall_sign", "light_gray_wall_sign", "cyan_wall_sign", "purple_wall_sign", "blue_wall_sign", "brown_wall_sign", "green_wall_sign", "red_wall_sign", "black_wall_sign", "suspicious_sand", "tuff", "calcite", "dripstone_block", "deepslate", "cobbled_deepslate", "polished_deepslate", "deepslate_bricks", "cracked_deepslate_bricks", "deepslate_tiles", "cracked_deepslate_tiles", "chiseled_deepslate", "infested_stone", "infested_cobblestone", "infested_stone_bricks", "infested_mossy_stone_bricks", "infested_cracked_stone_bricks" and "infested_chiseled_stone_bricks"
+
 
 # ---------- SKULLOWNER TAB COMPLETION ----------
 

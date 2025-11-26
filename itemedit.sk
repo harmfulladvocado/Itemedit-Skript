@@ -35,11 +35,7 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
             if arg-2 is "-clear":
                 set name of player's tool to ""
                 stop
-            if arg-2 is set:
-                if arg-3 isn't set:
-                    set name of player's tool to arg-2
-                else:
-                    set name of player's tool to "%arg-2% %arg-3% %arg-4% %arg-5% %arg-6%"
+            set name of player's tool to colored arg-2
 
 # ---------- LORE ----------
 
@@ -715,7 +711,7 @@ on tab complete of "/ie" and "/itemedit":
             set tab completions for position 3 to {_potioneffects::*}
             set tab completions for position 4 to "<level>", "1", "2", "3", "4" and "5"
             set tab completions for position 5 to "<time>", "10", "15", "20", "30", "60", "120", "300" and "600"
-            set tab completions for position 6 to "s", "sec", "second", "seconds", "m", "min", "minute", "minutes", "h", "hour" and "hours"
+            set tab completions for position 6 to "s", "seconds", "m", "minutes", "h" and "hours"
 
         if tab arg-2 is "remove":
             set tab completions for position 3 to {_potioneffects::*}

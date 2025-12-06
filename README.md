@@ -34,7 +34,6 @@ A **powerful Skript version of the "ItemEdit" plugin** for Minecraft servers. Pr
 - **Tab-Completion for all commands**
 - **Custom messages and feedback**
 
-> Full, detailed feature list in [the Spigot resource](https://www.spigotmc.org/resources/itemedit-skript.128574/)
 
 ---
 

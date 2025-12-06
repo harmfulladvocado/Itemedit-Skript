@@ -111,5 +111,3 @@ See all commands and usages via tab completion in-game or the script source.
 - Give feedback and suggestions on Discord!
 
 ---
-
-**Enjoy better in-game editing — without custom plugins, using just Skript!**

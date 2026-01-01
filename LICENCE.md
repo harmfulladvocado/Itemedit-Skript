@@ -1,4 +1,4 @@
-Copyright (c) 2025 harmfulladvocado  
+Copyright (c) 2026 harmfulladvocado  
 All rights reserved.  
 
 PERMISSION AND RESTRICTIONS  

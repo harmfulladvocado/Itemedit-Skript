@@ -3,26 +3,15 @@
 # MADE BY: hrmfullAdvocado
 # DEPENDENCIES: Skript, SkBee and SkCrew
 # =====================================
-function removeUnderscores(t: text) :: text:
-    set {_modified} to {_t}
-    replace all "_" in {_modified} with " "
-    return {_modified}
 
 on load:
     delete {itemedit::*}
-    delete {_enchant}
-    delete {_nbt}
-    delete {_item}
-    delete {_raw::*}
     delete {pe::*}
-    delete {_attr}
-    delete {_amount}
-    delete {_target}
 
 
 # ---------- ITEMEDIT COMMAND ----------
-command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
-    aliases: /itemedit
+command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>] [<text>] [<text>]:
+    aliases: itemedit
     permission: skript.itemedit
     trigger:
         set {_item} to player's tool
@@ -35,8 +24,21 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
             if arg-2 is "-clear":
                 set name of player's tool to ""
                 stop
-            set name of player's tool to colored arg-2
-
+            if arg-3 isn't set:
+                set name of player's tool to colored "&f%arg-2%"
+            else if arg-4 isn't set:
+                set name of player's tool to colored "&f%arg-2% %arg-3%"
+            else if arg-5 isn't set:
+                set name of player's tool to colored "&f%arg-2% %arg-3% %arg-4%"
+            else if arg-6 isn't set:
+                set name of player's tool to colored "&f%arg-2% %arg-3% %arg-4% %arg-5%"
+            else if arg-7 isn't set:
+                set name of player's tool to colored "&f%arg-2% %arg-3% %arg-4% %arg-5% %arg-6%"
+            else if arg-8 isn't set:
+                set name of player's tool to colored "&f%arg-2% %arg-3% %arg-4% %arg-5% %arg-6% %arg-7%"
+            else:
+                set name of player's tool to colored "&f%arg-2% %arg-3% %arg-4% %arg-5% %arg-6% %arg-7% %arg-8%"
+            send "&aItem name set to &f%name of player's tool%&a." to player
 # ---------- LORE ----------
 
         if arg-1 is "lore":
@@ -46,8 +48,16 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                     stop
                 if arg-4 isn't set:
                     add colored "&f%arg-3%" to lore of player's tool
-                else:
+                else if arg-5 isn't set:
+                    add colored "&f%arg-3% %arg-4%" to lore of player's tool
+                else if arg-6 isn't set:
+                    add colored "&f%arg-3% %arg-4% %arg-5%" to lore of player's tool
+                else if arg-7 isn't set:
                     add colored "&f%arg-3% %arg-4% %arg-5% %arg-6%" to lore of player's tool
+                else if arg-8 isn't set:
+                    add colored "&f%arg-3% %arg-4% %arg-5% %arg-6% %arg-7%" to lore of player's tool
+                else:
+                    add colored "&f%arg-3% %arg-4% %arg-5% %arg-6% %arg-7% %arg-8%" to lore of player's tool
                 send "&aLore line added to item." to player
 
             if arg-2 is "remove":
@@ -122,7 +132,8 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                 disenchant player's tool
                 send "&aAll enchantments have been removed from your item." to player
                 stop
-            set {_enchant} to removeUnderscores(arg-2)
+            set {_enchant} to arg-2
+            replace all "_" in {_enchant} with " "
             if {_enchant} isn't set:
                 send "&c%arg-2% is not a valid enchantment." to player
                 stop
@@ -267,8 +278,8 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
                         stop
                 else:
                     set {pe::%uuid of player%::duration} to 30 seconds
+                set {peobj::%uuid of player%} to potion effect of {pe::%uuid of player%} of tier {pe::%uuid of player%::level} for {pe::%uuid of player%::duration}
 
-                set {peobj::%uuid of player%} to new potion effect of {pe::%uuid of player%} potion of tier {pe::%uuid of player%::level} for {pe::%uuid of player%::duration}
 
                 loop potion effects of player's tool:
                     if type of loop-value is {pe::%uuid of player%}:
@@ -393,7 +404,9 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
         if arg-1 is "attribute":
             if arg-2 is "add":
                 if arg-3 contains "_":
-                    set {_attr} to removeUnderscores(arg-3) parsed as an attribute type
+                    set {_temp} to arg-3
+                    replace all "_" in {_temp} with " "
+                    set {_attr} to {_temp} parsed as an attribute type
                 else:
                     set {_attr} to arg-3 parsed as an attribute type
 
@@ -428,7 +441,9 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
 
             if arg-2 is "remove":
                 if arg-3 contains "_":
-                    set {_attr} to removeUnderscores(arg-3) parsed as an attribute type
+                    set {_temp} to arg-3
+                    replace all "_" in {_temp} with " "
+                    set {_attr} to {_temp} parsed as an attribute type
                 else:
                     set {_attr} to arg-3 parsed as an attribute type
                 delete {_attr} attribute modifier of player's tool
@@ -461,6 +476,7 @@ command /ie <text> [<text>] [<text>] [<text>] [<text>] [<text>]:
 # =====================================
 
 command /serveritem <text> [<text>] [<text>] [<text>]:
+    aliases: si
     permission: skript.serveritem
     trigger:
 
@@ -581,7 +597,7 @@ command /serveritem <text> [<text>] [<text>] [<text>]:
         # ==============================
         if arg-1 is "sell":
             if arg-4 is set:
-                set {_p} to arg-4 parsed as a player
+                set {_p} to arg-4 parsed as player
             else:
                 set {_p} to player
             if arg-2 is not set:
@@ -590,13 +606,12 @@ command /serveritem <text> [<text>] [<text>] [<text>]:
             if {serveritems::%arg-2%} is not set:
                 send "&cThat server item does not exist." to {_p}
                 stop
-            set {_price} to arg-3 parsed as a number
-            if {_p} does not have {serveritems::%arg-2%}:
+            if {_p} does not have 1 of {serveritems::%arg-2%}:
                 send "&cYou don't have that item to sell." to {_p}
                 stop
+            set {_price} to arg-3 parsed as number
             remove 1 of {serveritems::%arg-2%} from {_p}
-            add {_price} to balance of {_p}
-
+            set balance of {_p} to (balance of {_p}) + {_price}
         # ==============================
         # BUY
         # ==============================
@@ -801,7 +816,7 @@ on tab complete of "/ie" and "/itemedit":
 # ---------- ENCHANT TAB COMPLETION ----------
 
     if tab arg-1 is "enchant":
-        set {_enchants::*} to "-clear", "Fireprotection", "Sharpness", "Flame", "aqua_affinity", "Punch", "Loyalty", "Depth_strider", "Vanishing_curse", "Unbreaking", "Knockback", "Luck_of_thesea", "Binding_curse", "Fortune", "Protection", "Efficiency", "Mending", "Frost_walker", "Lure", "Looting", "Blast_protection", "Smite", "Fire_aspect", "Channeling", "Thorns", "Bane_of_arthropods", "Respiration", "Riptide", "Silk_touch", "Projectile_protection", "Impaling", "Feather_falling", "Power", "Infinity", "Glowing", "Piercing", "Multishot", "Quick_charge", "Soul_speed", "Swift_sneak", "Sweeping_edge", "Density", "Breach" and "Wind_burst"
+        set {_enchants::*} to "-clear", "Fireprotection", "Sharpness", "Flame", "aqua_affinity", "Punch", "Loyalty", "Depth_strider", "Vanishing_curse", "Unbreaking", "Knockback", "Luck_of_the_sea", "Binding_curse", "Fortune", "Protection", "Efficiency", "Mending", "Frost_walker", "Lure", "Looting", "Blast_protection", "Smite", "Fire_aspect", "Channeling", "Thorns", "Bane_of_arthropods", "Respiration", "Riptide", "Silk_touch", "Projectile_protection", "Impaling", "Feather_falling", "Power", "Infinity", "Glowing", "Piercing", "Multishot", "Quick_charge", "Soul_speed", "Swift_sneak", "Sweeping_edge", "Density", "Breach" and "Wind_burst"
         set tab completions for position 2 to {_enchants::*}
         set tab completions for position 3 to "1", "2", "3", "4" and "5"
 
@@ -811,7 +826,7 @@ on tab complete of "/ie" and "/itemedit":
 # SERVERITEM TAB COMPLETION
 # =====================================
 
-on tab complete of "/serveritem":
+on tab complete of "/serveritem" and "si":
     set tab completions for position 1 to "save", "give", "del", "buy", "take", "sell", "setnick" and "list"
 
     if tab arg-1 is "give", "buy", "setnick", "sell", "take" or "del":

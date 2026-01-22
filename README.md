@@ -91,7 +91,7 @@ See all commands and usages via tab completion in-game or the script source.
 
 - Ported/written by: **hrmfullAdvocado**
 - **Original ItemEdit plugin by [emanondev]([https://www.spigotmc.org/resources/itemedit-1-8-x-1-21-x.40993/](https://github.com/emanondev))**
-- [Permission message for Skript port](https://discord.com/channels/438120634640498690/815511174686572586/1412093889434882188)
+- [Permission message for Skript](https://discord.com/channels/438120634640498690/815511174686572586/1412093889434882188)
 
 ---
 
@@ -100,13 +100,5 @@ See all commands and usages via tab completion in-game or the script source.
 - **Support & Updates Discord:** [Join here](https://discord.gg/gmyNJMRZfJ)
 - **Original plugin:** [ItemEdit (Jar)](https://www.spigotmc.org/resources/itemedit-1-8-x-1-21-x.40993/)
 - **Skript version:** [Spigot Page](https://www.spigotmc.org/resources/itemedit-skript.128574/)
-
----
-
-## 📝 License / Usage
-
-- You must have permission from original plugin authors for redistribution.
-- Do not resell. Do not claim as your own.
-- Give feedback and suggestions on Discord!
 
 ---
